@@ -29,5 +29,13 @@
     <None Include="ethers07.bin">
       <Filter>Файлы ресурсов</Filter>
     </None>
+    <None Include="..\..\..\..\Downloads\ethers01.bin">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="out.txt">
+      <Filter>Исходные файлы</Filter>
+    </Text>
   </ItemGroup>
 </Project>

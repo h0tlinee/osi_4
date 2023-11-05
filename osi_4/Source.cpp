@@ -1,148 +1,123 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include <vector>
-#include <fstream>
-#include <iostream>
 #include <stdio.h>
-#include <WinSock.h>
+#include <stdlib.h>
+#include <WinSock2.h>
 #pragma comment (lib,"Ws2_32.lib")
 
-using namespace std;
-
-void MAC_print(char* MAC) {
-	int i;
-	for (i = 0; i < 5; i++) {
-		printf( "%02X:", (unsigned char)MAC[i]);
-	}
-	printf("%02X:",(unsigned char)MAC[i]);
-	cout << endl;
-}
-
-void IP_print(char* IP) {
-	int i;
-	for (i = 0; i < 3; i++) {
-		printf("%d.", (unsigned char)IP[i]);
-	}
-	printf("%d", (unsigned char)IP[i]);
-	cout << endl;
-}
-
-
+void MAC_print(FILE* out, unsigned char* MAC);
+void IP_print(FILE* out, unsigned char* IP);
 
 int main() {
-	//ifstream in;
-	ifstream out;
-	bool file_name_true=false;
-	string file_name;
-	int frame_number=1;
-	int filesize = 0;
-	FILE* in = NULL;
-	char* DATA;
-	setlocale(LC_ALL, "Russian");
+    FILE* in = NULL;
+    FILE* out = NULL;
+    bool enterfile = false;
+    char filename[100];
+    int filesize = 0;
+    int framenumber = 1;
+    unsigned char* DATA;
+    int types[10] = { 0 };
 
-	////ввод имени файла
-	/*while (!file_name_true) {
-		cout << "Введите имя файла для анализа потока кадров: ";
-		cin >> file_name;
+    while (!enterfile) {
+        printf("Enter the file name: ");
+        scanf_s("%s", filename, sizeof(filename));
+        fopen_s(&in, filename, "rb");
+        if (in != NULL) enterfile = true;
+        else printf("This does not exist! Try again.\n\n");
+    }
 
-		in.open(file_name, ios_base::in, ios::binary);
-		if (!in.is_open()) {
-			cout<<endl << "Файл не был найден! Попробуйте еще раз" << endl;
-		}
-		else {
-			cout << "Файл успешно открыт! " << endl;
-			file_name_true = true;
-		}
-	}*/
-	//in.seekg(0, ios_base::end);
-	////вывоводим размер файла
-	//int file_sz = in.tellg();
-	//cout << "Размер файла (в байтах): " << file_sz << endl;
-	//char* DATA = new char[file_sz];
-	//in.seekg(0, ios_base::beg);
-	//in.read(DATA, file_sz);
-	//cout << DATA << endl;
+    fopen_s(&out, "out.txt", "w");
+    fseek(in, 0, SEEK_END);
+    filesize = ftell(in);
+    fseek(in, 0, SEEK_SET);
+    DATA = new unsigned char[filesize];
+    fread(DATA, filesize, 1, in);
+    fclose(in);
 
-	////становимся в конец файла
-	//in.seekg(0, ios_base::end);
-	////вывоводим размер файла
-	//cout << "Размер файла (в байтах): " << in.tellg() << endl;
-	while (!file_name_true) {
-		cout << "Введите имя файла для анализа потока кадров: ";
-		cin >> file_name;
-		in = fopen(file_name.c_str(), "rb");
-		if (in != NULL) file_name_true = true;
-		else cout << "Такого файла нет!" << endl;
-	}
-	fseek(in, 0, SEEK_END);
-	filesize = ftell(in);
-	fseek(in, 0, SEEK_SET);
-	DATA = new char[filesize];
-	fread(DATA, filesize, 1, in);
-	fclose(in);
-	cout << "Размер файла: " << filesize << " байт" << endl;
+    fprintf(out, "size of file: %d bytes\n", filesize);
+    fprintf(out, "\n----------\n");
+    unsigned char* p = DATA;
 
-	/*vector<char> data;
-	if (!in.eof() && !in.fail()) {
-		in.seekg(0, ios_base::end);
-		cout << "Размер файла(в байтах): " << in.tellg() << endl;
-		streampos FileSize = in.tellg();
-		filesize = in.tellg();
+    while (p < DATA + filesize) {
 
-		data.resize(FileSize);
-		in.seekg(0, ios_base::beg);
-		in.read(&data[0], FileSize);
-	}*/
+        fprintf(out, "frame number: %d\n", framenumber);
+        fprintf(out, "MAC dest: ");
+        MAC_print(out, p);
+        fprintf(out, "MAC source: ");
+        MAC_print(out, p + 6);
+        unsigned short LT = ntohs(*(unsigned short*)(p + 12));
 
+        if (LT == 0x800) {
+            fprintf(out, "frame type: IPv4\n");
+            fprintf(out, "IP source: ");
+            IP_print(out, p + 26);
+            fprintf(out, "IP dest: ");
+            IP_print(out, p + 30);
+            LT = ntohs(*(unsigned short*)(p + 16)) + 14;
+            fprintf(out, "frame size: %d", LT);
+            fprintf(out, "\n----------\n");
+            p += LT;
+            framenumber++;
+            types[0] += 1;
+        }
+        else {
+            if (LT > 0x05FE) {
+                fprintf(out, "frame type: Ethernet DIX (Ethernet II)\n");
+                //fprintf(out, "frame size: %d", 14);
+                types[1] += 1;
+            }
+            
+            else if (LT <= 0x05FE) {
+                unsigned short F = ntohs(*(unsigned short*)(p + 14));
+                if (F == 0xFFFF) {
+                    fprintf(out, "frame type: Raw 802.3 (Ethernet 802.3)\n");
+                    fprintf(out, "frame size: %d", LT+14);
+                    types[2] += 1;
+                }
+                else if (F == 0xAAAA) {
+                    fprintf(out, "frame type: Ethernet SNAP\n");
+                    fprintf(out, "frame size: %d", LT+14);
+                    types[3] += 1;
+                }
+                else {
+                    fprintf(out, "frame type: 802.3/LLC (Ethernet 802.2)\n");
+                    fprintf(out, "frame size: %d", LT+14);
+                    types[4] += 1;
+                }
+            }
+            fprintf(out, "\n----------\n");
+            p += LT + 14;
+            framenumber++;
+        }
+    }
 
-	char* p = DATA;
-	//char *p = data.data();
-	while (p < (DATA+filesize)) {
-		cout << "Номер кадра: " << frame_number << endl;
-		cout << "MAC адрес получателя: "<<endl;
-		MAC_print(p);
-		cout << "MAC адрес отправителя: " << endl;
-		MAC_print(p + 6);
-		unsigned short LT = ntohs(*(unsigned short*)(p + 12));
-		if (LT == 0x800) {
-			cout << "Тип кадра: IPv4" << endl;
-			cout << "IP адрес отправителя: " << endl;
-			IP_print(p + 26);
-			cout << "IP адрес получателя: " << endl;
-			IP_print(p + 30);
-			LT = ntohs(*(unsigned short*)(p + 16)) + 14;
-			cout << "______ " << endl;
-			p += LT;
-			frame_number += 1;
-		}
-		else {
-			if (LT <= 0x05FE) {
-				cout << "Тип кадра: Ethernet DIX (Ethernet II)" << endl;
-			}
-			else {
-				if (LT <= 0x05FE) {
-					unsigned short F = ntohs(*(unsigned short*)(p + 14));
-					if (F == 0xFFFF) {
-						cout << "Тип кадра: Raw 802.3 (Ethernet 802.3)" << endl;
-					}
-					else {
-						if (F == 0xAAAA) {
-							cout << "Тип кадра: Ethernet SNAP" << endl;
-						}
-						else {
-							cout << "Тип кадра: 802.3/LLC (Ethernet 802.2)" << endl;
-						}
-					}
-				}
-			}
-			cout << "______" << endl;
-			p += LT + 14;
-			frame_number += 1;
-		}
-		//cout <<hex<<LT;
-	}
-	cout << "Всего кадров: " << frame_number - 1 << endl;
+    fprintf(out, "total number of frames: %d", framenumber - 1);
+    fprintf(out, "\nIPv4 frames: %d", types[0]);
+    fprintf(out, "\nEthernet DIX (Ethernet II) frames: %d", types[1]);
+    fprintf(out, "\nRaw 802.3 (Ethernet 802.3) frames: %d", types[2]);
+    fprintf(out, "\nEthernet SNAP frames: %d", types[3]);
+    fprintf(out, "\n802.3/LLC (Ethernet 802.2) frames: %d", types[4]);
+    fclose(out);
+
+    delete[] DATA; // Освобождаем память, выделенную под DATA
+
+    printf("\nDone!");
+    system("pause");
+
+    return 0;
+}
+
+void MAC_print(FILE* out, unsigned char* MAC) {
+    for (int i = 0; i < 5; i++)
+        fprintf(out, "%02X:", MAC[i]);
+    fprintf(out, "%02X\n", MAC[5]);
+}
+
+void IP_print(FILE* out, unsigned char* IP) {
+    for (int i = 0; i < 3; i++)
+        fprintf(out, "%d.", IP[i]);
+    fprintf(out, "%d\n", IP[3]);
+}
+
 
 	
 
 
-}

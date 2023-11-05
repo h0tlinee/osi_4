@@ -1,0 +1,129 @@
+size of file: 9339 bytes
+
+----------
+frame number: 1
+MAC dest: 00:02:16:09:FA:40
+MAC source: 00:90:27:A1:36:D0
+frame type: IPv4
+IP source: 195.62.2.11
+IP dest: 92.125.134.243
+frame size: 108
+----------
+frame number: 2
+MAC dest: 00:90:27:A1:36:D0
+MAC source: 00:02:16:09:FA:40
+frame type: IPv4
+IP source: 81.181.78.206
+IP dest: 195.62.2.11
+frame size: 210
+----------
+frame number: 3
+MAC dest: 00:90:27:A1:36:D0
+MAC source: 00:02:16:09:FA:40
+frame type: IPv4
+IP source: 92.125.134.243
+IP dest: 195.62.2.11
+frame size: 81
+----------
+frame number: 4
+MAC dest: 00:02:16:09:FA:40
+MAC source: 00:90:27:A1:36:D0
+frame type: IPv4
+IP source: 195.62.2.11
+IP dest: 92.125.134.243
+frame size: 94
+----------
+frame number: 5
+MAC dest: 00:90:27:A1:36:D0
+MAC source: 00:02:16:09:FA:40
+frame type: IPv4
+IP source: 92.125.134.243
+IP dest: 195.62.2.11
+frame size: 81
+----------
+frame number: 6
+MAC dest: 00:02:16:09:FA:40
+MAC source: 00:90:27:A1:36:D0
+frame type: IPv4
+IP source: 195.62.2.11
+IP dest: 92.125.134.243
+frame size: 1406
+----------
+frame number: 7
+MAC dest: 00:02:16:09:FA:40
+MAC source: 00:90:27:A1:36:D0
+frame type: IPv4
+IP source: 195.62.2.11
+IP dest: 92.125.134.243
+frame size: 1406
+----------
+frame number: 8
+MAC dest: 00:02:16:09:FA:40
+MAC source: 00:90:27:A1:36:D0
+frame type: IPv4
+IP source: 195.62.2.11
+IP dest: 92.125.134.243
+frame size: 1406
+----------
+frame number: 9
+MAC dest: 00:02:16:09:FA:40
+MAC source: 00:90:27:A1:36:D0
+frame type: IPv4
+IP source: 195.62.2.11
+IP dest: 92.125.134.243
+frame size: 1406
+----------
+frame number: 10
+MAC dest: 00:02:16:09:FA:40
+MAC source: 00:90:27:A1:36:D0
+frame type: IPv4
+IP source: 195.62.2.11
+IP dest: 92.125.134.243
+frame size: 1406
+----------
+frame number: 11
+MAC dest: 00:02:16:09:FA:40
+MAC source: 00:08:02:35:2F:1C
+frame type: IPv4
+IP source: 195.62.2.45
+IP dest: 64.12.24.144
+frame size: 54
+----------
+frame number: 12
+MAC dest: 00:02:16:09:FA:40
+MAC source: 00:90:27:A1:36:D0
+frame type: IPv4
+IP source: 195.62.2.11
+IP dest: 81.181.78.206
+frame size: 66
+----------
+frame number: 13
+MAC dest: 00:90:27:A1:36:D0
+MAC source: 00:02:16:09:FA:40
+frame type: IPv4
+IP source: 92.125.134.243
+IP dest: 195.62.2.11
+frame size: 54
+----------
+frame number: 14
+MAC dest: 00:02:16:09:FA:40
+MAC source: 00:90:27:A1:36:D0
+frame type: IPv4
+IP source: 195.62.2.11
+IP dest: 92.125.134.243
+frame size: 1406
+----------
+frame number: 15
+MAC dest: 00:02:16:09:FA:40
+MAC source: 00:90:27:A1:36:D0
+frame type: IPv4
+IP source: 195.62.2.11
+IP dest: 92.125.134.243
+frame size: 155
+----------
+total number of frames: 15
+IPv4 frames: 15
+Ethernet DIX (Ethernet II) frames: 0
+Raw 802.3 (Ethernet 802.3) frames: 0
+Ethernet SNAP frames: 0
+802.3/LLC (Ethernet 802.2) frames: 0
